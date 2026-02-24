@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Channel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:            #080a0f;
+      --surface:       rgba(255,255,255,0.03);
+      --border:        rgba(255,255,255,0.07);
+      --border-bright: rgba(255,255,255,0.14);
+      --accent:        #4f7fff;
+      --accent-dim:    rgba(79,127,255,0.12);
+      --text-primary:  rgba(255,255,255,0.92);
+      --text-secondary:rgba(255,255,255,0.45);
+      --text-muted:    rgba(255,255,255,0.22);
+      --font-ui:       'Chakra Petch', monospace;
+      --font-data:     'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      height: 100%;
+      -webkit-font-smoothing: antialiased;
+    }
+    .panel {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 100vh;
+    }
+    .panel-header {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .channel-identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .channel-identity img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border-bright);
+    }
+    .channel-identity .placeholder-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .channel-name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+    .channel-handle {
+      font-family: var(--font-data);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+    }
+    .stat-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .stat-label {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .stat-value {
+      font-family: var(--font-data);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .stat-value.accent { color: var(--accent); }
+    .last-upload {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .last-upload-label {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .last-upload-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    .last-upload-meta {
+      font-family: var(--font-data);
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .avg-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+    }
+    .avg-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .avg-value {
+      font-family: var(--font-data);
+      font-size: 13px;
+      color: var(--accent);
+    }
+    .state-loading, .state-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 1.5px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .panel-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="panel-header">My Channel</div>
+    <div id="content">
+      <div class="state-loading">
+        <div class="spinner"></div>
+        <span>Fetching data…</span>
+      </div>
+    </div>
+    <div class="panel-footer" id="footer">YouTube Data API v3</div>
+  </div>
+
+  <script>
+    // ── CONFIG — edit these ──
+    const MY_CHANNEL_ID   = "UC8bINGUBwLZJwUCW5DbbXkA";
+    const API_KEY         = "AIzaSyBB18lRopqFjcKoTh2FeLGi3b1vmYawHfE";
+    const RECENT_COUNT    = 10;
+    const CACHE_MINUTES   = 20;
+    const CACHE_KEY       = "my_channel_v2";
+    const YT_API          = "https://www.googleapis.com/youtube/v3";
+
+    function fmt(n) {
+      if (n >= 1_000_000) return (n/1_000_000).toFixed(1).replace(/\.0$/,"")+"M";
+      if (n >= 1_000) return (n/1_000).toFixed(1).replace(/\.0$/,"")+"K";
+      return String(n);
+    }
+
+    function timeAgo(iso) {
+      const diff = (Date.now() - new Date(iso)) / 1000;
+      if (diff < 3600) return Math.round(diff/60)+"m ago";
+      if (diff < 86400) return Math.round(diff/3600)+"h ago";
+      if (diff < 604800) return Math.round(diff/86400)+"d ago";
+      return new Date(iso).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+    }
+
+    function loadCache() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const {ts,data} = JSON.parse(raw);
+        if ((Date.now()-ts)/60000 < CACHE_MINUTES) return data;
+      } catch(_) {}
+      return null;
+    }
+
+    function saveCache(data) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),data})); } catch(_){}
+    }
+
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    async function getData() {
+      const cached = loadCache();
+      if (cached) return cached;
+
+      const ch = await fetchJSON(
+        `${YT_API}/channels?part=snippet,statistics,contentDetails&id=${MY_CHANNEL_ID}&key=${API_KEY}`
+      );
+      const item = ch.items?.[0];
+      if (!item) throw new Error("Channel not found");
+
+      const stats = item.statistics;
+      const playlistId = item.contentDetails?.relatedPlaylists?.uploads;
+
+      let lastTitle="—", lastPublished=null, avgViews=0;
+      if (playlistId) {
+        const pl = await fetchJSON(
+          `${YT_API}/playlistItems?part=snippet,contentDetails&maxResults=${RECENT_COUNT}&playlistId=${playlistId}&key=${API_KEY}`
+        );
+        const items = pl.items || [];
+        if (items.length) {
+          lastTitle = items[0].snippet.title;
+          lastPublished = items[0].contentDetails.videoPublishedAt || items[0].snippet.publishedAt;
+          const ids = items.map(i=>i.contentDetails.videoId).join(",");
+          const vs = await fetchJSON(`${YT_API}/videos?part=statistics&id=${ids}&key=${API_KEY}`);
+          const views = (vs.items||[]).map(v=>parseInt(v.statistics?.viewCount||"0",10));
+          avgViews = views.length ? Math.round(views.reduce((a,b)=>a+b,0)/views.length) : 0;
+        }
+      }
+
+      const data = {
+        title: item.snippet.title,
+        thumbnail: item.snippet.thumbnails?.default?.url,
+        subscribers: parseInt(stats.subscriberCount||"0",10),
+        totalViews: parseInt(stats.viewCount||"0",10),
+        videoCount: parseInt(stats.videoCount||"0",10),
+        lastTitle, lastPublished, avgViews,
+      };
+      saveCache(data);
+      return data;
+    }
+
+    async function init() {
+      const content = document.getElementById("content");
+      try {
+        const d = await getData();
+        content.innerHTML = `
+          <div class="channel-identity">
+            ${d.thumbnail ? `<img src="${d.thumbnail}" alt="">` : `<div class="placeholder-avatar"></div>`}
+            <div>
+              <div class="channel-name">${d.title}</div>
+              <div class="channel-handle">youtube.com/channel/${MY_CHANNEL_ID}</div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-tile">
+              <div class="stat-label">Subscribers</div>
+              <div class="stat-value accent">${fmt(d.subscribers)}</div>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-label">Total Views</div>
+              <div class="stat-value">${fmt(d.totalViews)}</div>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-label">Videos</div>
+              <div class="stat-value">${fmt(d.videoCount)}</div>
+            </div>
+          </div>
+
+          <div class="last-upload">
+            <div class="last-upload-label">Latest Upload</div>
+            <div class="last-upload-title">${d.lastTitle}</div>
+            <div class="last-upload-meta">${d.lastPublished ? timeAgo(d.lastPublished) : "—"}</div>
+          </div>
+
+          <div class="avg-row">
+            <span class="avg-label">Avg views · last ${RECENT_COUNT} uploads</span>
+            <span class="avg-value">${fmt(d.avgViews)}</span>
+          </div>
+        `;
+        document.getElementById("footer").textContent = `cached · refreshes every ${CACHE_MINUTES}min`;
+      } catch(err) {
+        content.innerHTML = `
+          <div class="state-error">
+            <span>⚠ Data unavailable</span>
+            <span style="font-size:10px;opacity:0.5">${err.message}</span>
+          </div>`;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
